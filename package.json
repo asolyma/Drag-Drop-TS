@@ -1,0 +1,35 @@
+{
+  "name": "drag-drop-ts",
+  "version": "1.0.0",
+  "description": "A simple drag and drop app using typescript",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "dev": "parcel src/index.html",
+    "tsc": "tsc --watch & serve",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asolyma/Drag-Drop-TS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asolyma/Drag-Drop-TS/issues"
+  },
+  "homepage": "https://github.com/asolyma/Drag-Drop-TS#readme",
+  "devDependencies": {
+    "@types/joi": "^17.2.3",
+    "@typescript-eslint/eslint-plugin": "^4.29.3",
+    "@typescript-eslint/parser": "^4.29.3",
+    "eslint": "^7.32.0",
+    "prettier": "^2.3.2"
+  },
+  "dependencies": {
+    "@types/uuid": "^8.3.1",
+    "joi": "^17.4.2",
+    "parcel": "^2.0.0-rc.0"
+  }
+}
