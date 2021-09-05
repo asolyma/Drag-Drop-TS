@@ -1,28 +1,17 @@
-// import { Store } from "./Store";
-// import { IuserInput } from "./UserInput";
-// import { Project } from "./Project";
-
+import { Component } from "./Component";
 import { Project } from "./Project";
 import { State } from "./State";
 
-export class ProjectList {
-  private Template: HTMLTemplateElement;
-  private root: HTMLDivElement;
-  private static element: HTMLElement;
+export class ProjectList extends Component<HTMLElement, HTMLDivElement> {
   private type: "active" | "finished" | "pending";
   assignedProjects: Project[];
 
   constructor(type: "active" | "finished" | "pending") {
+    super("project-list", "section", "app");
     this.type = type;
+    this.element.id = `${this.type}-projects`;
     this.assignedProjects = [];
-    this.Template = <HTMLTemplateElement>(
-      document.getElementById("project-list")?.cloneNode(true)
-    );
-    ProjectList.element = <HTMLElement>(
-      this.Template.content.querySelector("section")
-    );
-    this.root = <HTMLDivElement>document.getElementById("app");
-    ProjectList.element.id = `${this.type}-projects`;
+
     State.getInstance().addListener((projects) => {
       const relevantProject = projects.filter((proj) => {
         if (type == "active") {
@@ -34,54 +23,24 @@ export class ProjectList {
         }
       });
       this.assignedProjects = relevantProject;
-      this.renderProjects();
+      this.renderComponent();
     });
-    this.attatch();
-    this.render();
-  }
-
-  private attatch() {
-    this.root.append(ProjectList.element);
-  }
-
-  private render(): void {
-    if (ProjectList.element) {
-      const projUl = ProjectList.element.querySelector("ul");
-      const projHeader = ProjectList.element.querySelector("h2");
+    if (this.element) {
+      const projUl = this.element.querySelector("ul");
+      const projHeader = this.element.querySelector("h2");
       if (projUl) {
         projUl.id = `${this.type}-project-list`;
       } else {
-        console.error("error");
+        throw new Error("error");
       }
       if (projHeader) {
         projHeader.textContent = `${this.type} Projects`.toUpperCase();
       }
     }
   }
-
-  renderProjects() {
-    const ul: HTMLUListElement = <HTMLUListElement>(
-      document.getElementById(`${this.type}-project-list`)
-    );
-    ul.innerHTML = "";
+  renderComponent(): void {
     this.assignedProjects.map((prj) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<h3>Project Title: ${prj.title} <span class='close'>X</span></h3> `;
-      ul.append(li);
+      new Project(prj);
     });
-    ul.append();
   }
-  // static attachProject(): void {
-  //   const target: HTMLUListElement = <HTMLUListElement>(
-  //     document.getElementById("active-project-list")
-  //   );
-  //   target.innerHTML = "";
-  //   Store.getInstacne().projects.map((proj: IuserInput) => {
-  //     const component = new Project(proj).getProj();
-  //     target.appendChild(component); //new Project(proj).getProj());
-  //   });
-  // }
-  // static detachProject(title: string): void {
-  //   Store.getInstacne().removeProject(title);
-  // }
 }
