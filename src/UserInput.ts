@@ -1,13 +1,8 @@
 import { bindThis } from "./bindThis";
 import { schema } from "./app";
-import { Store } from "./Store";
-import { ProjectList } from "./ProjectList";
-const state = Store.getInstacne();
-export interface IuserInput {
-  title: string;
-  description: string;
-  people: string | undefined;
-}
+import { IuserInput } from "./Types";
+import { State } from "./State";
+// import { ProjectList } from "./ProjectList";
 
 export class UserInput {
   private Template: HTMLTemplateElement;
@@ -46,7 +41,7 @@ export class UserInput {
     this.userinput.description = (<HTMLInputElement>(
       document.getElementById("description")
     )).value;
-    this.userinput.people = (<HTMLInputElement>(
+    this.userinput.people = +(<HTMLInputElement>(
       document.getElementById("people")
     )).value;
     const result:
@@ -54,8 +49,9 @@ export class UserInput {
       | { ErrorMessage: string; label: string | undefined } =
       await this.validate();
     if ("title" in result) {
-      state.addProject(result);
-      ProjectList.attachProject();
+      State.getInstance().addProject(result);
+      console.log(State.getInstance().projects);
+      // ProjectList.attachProject();
     } else {
       console.error(result.ErrorMessage);
     }

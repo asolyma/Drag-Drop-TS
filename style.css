@@ -69,11 +69,11 @@ button:active {
 }
 
 #finished-projects {
-  border-color: #0044ff;
+  border-color: #00ff74b3;
 }
 
 #finished-projects header {
-  background: #0044ff;
+  background: #00ff74b3;
 }
 
 #pending-projects {
@@ -101,7 +101,7 @@ button:active {
 }
 
 .projects li h2 {
-  color: #ff0062;
+  color: #ff0062a8;
   margin: 0.5rem 0;
 }
 

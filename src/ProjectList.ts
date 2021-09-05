@@ -1,28 +1,51 @@
-import { Store } from "./Store";
-import { IuserInput } from "./UserInput";
+// import { Store } from "./Store";
+// import { IuserInput } from "./UserInput";
+// import { Project } from "./Project";
+
 import { Project } from "./Project";
+import { State } from "./State";
 
 export class ProjectList {
   private Template: HTMLTemplateElement;
   private root: HTMLDivElement;
   private static element: HTMLElement;
   private type: "active" | "finished" | "pending";
-  // private projects:IuserInput
+  assignedProjects: Project[];
 
   constructor(type: "active" | "finished" | "pending") {
     this.type = type;
+    this.assignedProjects = [];
     this.Template = <HTMLTemplateElement>(
-      document.getElementById("project-list")
+      document.getElementById("project-list")?.cloneNode(true)
     );
-    const Fragment = <DocumentFragment>this.Template.content.cloneNode(true);
-    ProjectList.element = <HTMLElement>Fragment.querySelector("section");
+    ProjectList.element = <HTMLElement>(
+      this.Template.content.querySelector("section")
+    );
     this.root = <HTMLDivElement>document.getElementById("app");
-    ProjectList.element.id = `${type}-projects`;
+    ProjectList.element.id = `${this.type}-projects`;
+    State.getInstance().addListener((projects) => {
+      const relevantProject = projects.filter((proj) => {
+        if (type == "active") {
+          return proj.status == "active";
+        } else if (type == "finished") {
+          return proj.status == "finished";
+        } else {
+          return proj.status == "pending";
+        }
+      });
+      this.assignedProjects = relevantProject;
+      this.renderProjects();
+    });
+    this.attatch();
     this.render();
   }
-  render(): void {
+
+  private attatch() {
+    this.root.append(ProjectList.element);
+  }
+
+  private render(): void {
     if (ProjectList.element) {
-      this.root.appendChild(ProjectList.element);
       const projUl = ProjectList.element.querySelector("ul");
       const projHeader = ProjectList.element.querySelector("h2");
       if (projUl) {
@@ -35,17 +58,30 @@ export class ProjectList {
       }
     }
   }
-  static attachProject(): void {
-    const target: HTMLUListElement = <HTMLUListElement>(
-      document.getElementById("active-project-list")
+
+  renderProjects() {
+    const ul: HTMLUListElement = <HTMLUListElement>(
+      document.getElementById(`${this.type}-project-list`)
     );
-    target.innerHTML = "";
-    Store.getInstacne().projects.map((proj: IuserInput) => {
-      const component = new Project(proj).getProj();
-      target.appendChild(component); //new Project(proj).getProj());
+    ul.innerHTML = "";
+    this.assignedProjects.map((prj) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<h3>Project Title: ${prj.title} <span class='close'>X</span></h3> `;
+      ul.append(li);
     });
+    ul.append();
   }
-  static detachProject(title: string): void {
-    Store.getInstacne().removeProject(title);
-  }
+  // static attachProject(): void {
+  //   const target: HTMLUListElement = <HTMLUListElement>(
+  //     document.getElementById("active-project-list")
+  //   );
+  //   target.innerHTML = "";
+  //   Store.getInstacne().projects.map((proj: IuserInput) => {
+  //     const component = new Project(proj).getProj();
+  //     target.appendChild(component); //new Project(proj).getProj());
+  //   });
+  // }
+  // static detachProject(title: string): void {
+  //   Store.getInstacne().removeProject(title);
+  // }
 }
