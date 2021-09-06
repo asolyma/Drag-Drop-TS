@@ -1,16 +1,26 @@
+import { bindThis } from "./bindThis";
 import { Component } from "./Component";
 import { Project } from "./Project";
 import { State } from "./State";
+import { Dragtarget } from "./Types";
 
-export class ProjectList extends Component<HTMLElement, HTMLDivElement> {
+export class ProjectList
+  extends Component<HTMLElement, HTMLDivElement>
+  implements Dragtarget
+{
   private type: "active" | "finished" | "pending";
   assignedProjects: Project[];
 
   constructor(type: "active" | "finished" | "pending") {
     super("project-list", "section", "app");
+
     this.type = type;
-    this.element.id = `${this.type}-projects`;
     this.assignedProjects = [];
+    this.element.id = `${this.type}-projects`;
+
+    this.element.addEventListener("dragover", this.dragoverHandler);
+    this.element.addEventListener("dragleave", this.dragLeavehandler);
+    this.element.addEventListener("drop", this.dropHandler);
 
     State.getInstance().addListener((projects) => {
       const relevantProject = projects.filter((proj) => {
@@ -22,9 +32,11 @@ export class ProjectList extends Component<HTMLElement, HTMLDivElement> {
           return proj.status == "pending";
         }
       });
+
       this.assignedProjects = relevantProject;
       this.renderComponent();
     });
+
     if (this.element) {
       const projUl = this.element.querySelector("ul");
       const projHeader = this.element.querySelector("h2");
@@ -38,7 +50,35 @@ export class ProjectList extends Component<HTMLElement, HTMLDivElement> {
       }
     }
   }
+  @bindThis
+  dragoverHandler(event: DragEvent): void {
+    if (event.dataTransfer && event.dataTransfer.types[0] === "text/plain") {
+      event.preventDefault();
+      this.element.classList.add("droppable");
+    } else {
+      throw new Error("no data on data transfer object ");
+    }
+  }
+  @bindThis
+  dropHandler(event: DragEvent): void {
+    if (event.dataTransfer) {
+      const id = event.dataTransfer.getData("text/plain");
+      State.getInstance().moveProject(id, this.type);
+      this.element.classList.remove("droppable");
+    } else {
+      throw new Error("no data on the data transfer Object");
+    }
+  }
+  @bindThis
+  dragLeavehandler(): void {
+    this.element.classList.remove("droppable");
+  }
+
   renderComponent(): void {
+    const projUl = this.element.querySelector("ul");
+    if (projUl) {
+      projUl.innerHTML = "";
+    }
     this.assignedProjects.map((prj) => {
       new Project(prj);
     });

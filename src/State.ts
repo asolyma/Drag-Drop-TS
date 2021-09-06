@@ -31,9 +31,18 @@ export class State {
       id: `${v4()}`,
       status: "active",
     };
-    const addedProject = new Project(project);
+    // const addedProject = new Project(project);
+    this.projects.push(<Project>project);
+    for (const listener of this.listeners) {
+      listener(this.projects.slice());
+    }
+  }
 
-    this.projects.push(addedProject);
+  moveProject(ProjID: string, status: "active" | "finished" | "pending"): void {
+    const found = this.projects.find((prj) => prj.id === ProjID);
+    if (found) {
+      found.status = status;
+    }
     for (const listener of this.listeners) {
       listener(this.projects.slice());
     }

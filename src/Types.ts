@@ -10,3 +10,14 @@ export interface IuserInput {
   description: string;
   people: number | undefined;
 }
+
+export interface Draggable {
+  dragstarthandler(event: DragEvent): void;
+  dragEndhandler(event: DragEvent): void;
+}
+
+export interface Dragtarget {
+  dragoverHandler(event: DragEvent): void;
+  dropHandler(event: DragEvent): void;
+  dragLeavehandler(event: DragEvent): void;
+}
