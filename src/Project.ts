@@ -1,5 +1,6 @@
 import { bindThis } from "./bindThis";
 import { Component } from "./Component";
+import { State } from "./State";
 import { AddedProject, Draggable } from "./Types";
 
 export class Project
@@ -25,15 +26,17 @@ export class Project
   }
   @bindThis
   dragstarthandler(event: DragEvent): void {
-    event.dataTransfer!.setData("text/plain", this.id);
-    event.dataTransfer!.effectAllowed = "move";
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", this.id);
+    }
   }
   @bindThis
-  dragEndhandler(event: DragEvent): void {
-    console.log("dragend");
+  dragEndhandler(_: DragEvent): void {
+    console.log("item was moved");
   }
 
-  configure() {
+  configure(): void {
     this.element.addEventListener("dragstart", this.dragstarthandler);
     this.element.addEventListener("dragend", this.dragEndhandler);
   }
@@ -65,7 +68,9 @@ export class Project
     const close = this.element.querySelector(".close");
 
     if (close) {
-      close.addEventListener("click", () => console.log("should close"));
+      close.addEventListener("click", () =>
+        State.getInstance().removeProject(this.title)
+      );
     }
     this.target.appendChild(this.element);
   }

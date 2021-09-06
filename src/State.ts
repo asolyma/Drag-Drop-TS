@@ -40,9 +40,18 @@ export class State {
 
   moveProject(ProjID: string, status: "active" | "finished" | "pending"): void {
     const found = this.projects.find((prj) => prj.id === ProjID);
-    if (found) {
+    if (found && found.status != status) {
       found.status = status;
+      for (const listener of this.listeners) {
+        listener(this.projects.slice());
+      }
     }
+  }
+  removeProject(title: string): void {
+    const filtered: Project[] = State.getInstance().projects.filter((e) => {
+      return e.title !== title;
+    });
+    this.projects = filtered;
     for (const listener of this.listeners) {
       listener(this.projects.slice());
     }
