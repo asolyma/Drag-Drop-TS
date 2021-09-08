@@ -136,3 +136,7 @@ button:active {
   float: right;
   cursor: pointer;
 }
+
+li {
+  overflow-wrap: anywhere;
+}
